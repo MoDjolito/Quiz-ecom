@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quel est le niveau email de ton e-commerce ? — Quiz gratuit</title>
+  <style>
+    :root {
+      --bg: #0a0a0f; --accent: #e8a020; --accent2: #f5c050;
+      --text: #f0f0f0; --muted: #8888aa;
+      --border: rgba(255,255,255,0.07); --card: rgba(255,255,255,0.04);
+      --radius: 16px; --green: #3ecf8e; --red: #ff4d4d;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; line-height: 1.65; overflow-x: hidden; min-height: 100vh; }
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 16px 40px; background: rgba(10,10,15,0.9); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+    .nav-logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1rem; color: var(--text); text-decoration: none; }
+    .nav-logo img { height: 48px; width: auto; }
+    .nav-logo span { color: var(--accent); }
+    .nav-cta { background: var(--accent); color: #fff; border: none; padding: 9px 20px; border-radius: 8px; font-weight: 700; font-size: 0.88rem; cursor: pointer; text-decoration: none; transition: background 0.2s; display: inline-block; }
+    .nav-cta:hover { background: var(--accent2); }
+    .quiz-wrapper { min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 112px 24px 80px; }
+    /* INTRO */
+    .quiz-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(232,160,32,0.12); border: 1px solid rgba(232,160,32,0.3); color: var(--accent); font-size: 0.8rem; font-weight: 600; padding: 6px 16px; border-radius: 100px; margin-bottom: 28px; }
+    #screen-intro h1 { font-size: clamp(1.9rem, 4.5vw, 3rem); font-weight: 900; line-height: 1.15; letter-spacing: -1.2px; margin-bottom: 20px; text-align: center; }
+    .hl { background: linear-gradient(135deg, var(--accent), #ffb347); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .intro-sub { color: var(--muted); font-size: 1.05rem; max-width: 540px; margin: 0 auto 32px; text-align: center; }
+    .meta-row { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }
+    .meta-item { display: flex; align-items: center; gap: 7px; font-size: 0.85rem; color: var(--muted); }
+    .btn-start { display: inline-block; background: linear-gradient(135deg, #b8860b, #e8a020, #f5c050); color: #1a1200; padding: 18px 48px; border-radius: 12px; font-weight: 900; font-size: 1.1rem; border: none; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 28px rgba(232,160,32,0.4); font-family: inherit; }
+    .btn-start:hover { transform: translateY(-3px); box-shadow: 0 10px 36px rgba(245,192,80,0.5); }
+    /* QUIZ */
+    .progress-wrap { background: rgba(255,255,255,0.06); border-radius: 100px; height: 6px; margin-bottom: 32px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.5s ease; }
+    .q-counter { font-size: 0.78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; }
+    .q-counter span { color: var(--accent); }
+    .q-text { font-size: clamp(1.15rem, 2.8vw, 1.55rem); font-weight: 800; line-height: 1.3; letter-spacing: -0.5px; margin-bottom: 32px; }
+    .choices { display: flex; flex-direction: column; gap: 12px; }
+    .choice-btn { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 24px; color: var(--text); font-size: 0.97rem; font-weight: 500; cursor: pointer; text-align: left; transition: border-color 0.2s, background 0.2s, transform 0.15s; display: flex; align-items: center; gap: 14px; font-family: inherit; }
+    .choice-btn:hover { border-color: rgba(232,160,32,0.5); background: rgba(232,160,32,0.06); transform: translateX(4px); }
+    .choice-btn .letter { min-width: 30px; height: 30px; border-radius: 8px; background: rgba(232,160,32,0.12); border: 1px solid rgba(232,160,32,0.25); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.82rem; color: var(--accent); flex-shrink: 0; }
+    .choice-btn.selected { border-color: var(--accent); background: rgba(232,160,32,0.1); }
+    .choice-btn.selected .letter { background: var(--accent); color: #1a1200; border-color: var(--accent); }
+    .choice-btn:disabled { cursor: default; }
+    /* EMAIL */
+    .email-icon { width: 72px; height: 72px; margin: 0 auto 24px; border-radius: 50%; background: rgba(232,160,32,0.1); border: 1px solid rgba(232,160,32,0.3); display: flex; align-items: center; justify-content: center; font-size: 2rem; }
+    #screen-email h2 { font-size: clamp(1.5rem, 3.5vw, 2.1rem); font-weight: 900; letter-spacing: -0.8px; line-height: 1.2; margin-bottom: 14px; text-align: center; }
+    .email-sub { color: var(--muted); font-size: 0.97rem; max-width: 440px; margin: 0 auto 28px; line-height: 1.65; text-align: center; }
+    .email-preview { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; margin-bottom: 28px; display: flex; flex-direction: column; gap: 8px; }
+    .preview-line { display: flex; align-items: flex-start; gap: 10px; font-size: 0.88rem; color: var(--muted); }
+    .preview-line .chk { color: var(--green); flex-shrink: 0; font-weight: 700; }
+    .email-form { display: flex; flex-direction: column; gap: 12px; }
+    .field-label { font-size: 0.82rem; font-weight: 700; color: var(--muted); display: block; margin-bottom: 6px; }
+    .email-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 10px; padding: 15px 18px; color: var(--text); font-size: 1rem; font-family: inherit; outline: none; transition: border-color 0.2s; }
+    .email-input::placeholder { color: var(--muted); }
+    .email-input:focus { border-color: rgba(232,160,32,0.6); }
+    .email-input.error { border-color: var(--red); }
+    .field-error { font-size: 0.8rem; color: var(--red); display: none; margin-top: 4px; }
+    .field-error.show { display: block; }
+    .btn-submit { width: 100%; background: linear-gradient(135deg, #b8860b, #e8a020, #f5c050); color: #1a1200; padding: 16px; border-radius: 12px; font-weight: 900; font-size: 1.05rem; border: none; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 24px rgba(232,160,32,0.35); font-family: inherit; }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(245,192,80,0.5); }
+    .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+    .privacy-note { display: flex; align-items: center; gap: 7px; justify-content: center; font-size: 0.78rem; color: var(--muted); margin-top: 8px; }
+    /* RESULT */
+    .result-badge { display: inline-flex; align-items: center; font-size: 0.8rem; font-weight: 700; padding: 6px 18px; border-radius: 100px; margin-bottom: 24px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .score-ring { width: 140px; height: 140px; margin: 0 auto 32px; border-radius: 50%; background: conic-gradient(var(--accent) var(--pct, 0%), rgba(255,255,255,0.06) 0%); display: flex; align-items: center; justify-content: center; position: relative; }
+    .score-ring::before { content: ''; position: absolute; inset: 14px; background: var(--bg); border-radius: 50%; }
+    .score-val { position: relative; z-index: 1; font-size: 2rem; font-weight: 900; letter-spacing: -1px; }
+    #screen-result h2 { font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 900; letter-spacing: -1px; line-height: 1.2; margin-bottom: 16px; }
+    .result-sub { color: var(--muted); font-size: 1rem; max-width: 560px; margin: 0 auto 40px; line-height: 1.7; }
+    .gaps-box { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 32px; margin-bottom: 32px; text-align: left; }
+    .gaps-box h3 { font-size: 1rem; font-weight: 800; margin-bottom: 16px; }
+    .gaps-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .gaps-list li { display: flex; gap: 10px; font-size: 0.9rem; color: var(--muted); line-height: 1.4; }
+    .gaps-list li .dot { color: var(--accent); flex-shrink: 0; font-weight: 900; }
+    .cta-box { background: linear-gradient(135deg, rgba(232,160,32,0.1), rgba(232,160,32,0.04)); border: 1px solid rgba(232,160,32,0.3); border-radius: var(--radius); padding: 36px 32px; margin-bottom: 28px; }
+    .cta-box h3 { font-size: 1.25rem; font-weight: 900; margin-bottom: 10px; }
+    .cta-box p { color: var(--muted); font-size: 0.93rem; margin-bottom: 28px; line-height: 1.6; }
+    .btn-cta { display: inline-block; background: linear-gradient(135deg, #b8860b, #e8a020, #f5c050); color: #1a1200; padding: 16px 44px; border-radius: 12px; font-weight: 900; font-size: 1.05rem; text-decoration: none; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 24px rgba(232,160,32,0.4); }
+    .btn-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(245,192,80,0.5); }
+    .result-meta { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 32px; }
+    .result-meta-item { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--muted); }
+    .btn-retry { background: none; border: 1px solid var(--border); color: var(--muted); padding: 10px 24px; border-radius: 8px; font-size: 0.85rem; cursor: pointer; font-family: inherit; transition: border-color 0.2s, color 0.2s; }
+    .btn-retry:hover { border-color: var(--accent); color: var(--text); }
+    footer { text-align: center; padding: 28px 24px; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.8rem; margin-top: 48px; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fadeUp 0.45s ease forwards; }
+    @media (max-width: 600px) { nav { padding: 14px 18px; } .nav-logo img { height: 38px; } .quiz-wrapper { padding: 96px 16px 60px; } .gaps-box, .cta-box { padding: 22px 18px; } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="2.png" alt="Logo" />
+    Jordan<span>-</span>Hélios Rédaction
+  </a>
+  <a href="index.html#contact" class="nav-cta">Réserver un appel gratuit</a>
+</nav>
+
+<div class="quiz-wrapper">
+
+  <div id="screen-intro" class="fade-in" style="width:100%; max-width:680px; text-align:center;">
+    <div class="quiz-badge">✉️ Quiz gratuit — E-commerce &amp; Email Marketing</div>
+    <h1>Ton e-commerce exploite-t-il <span class="hl">vraiment</span><br>sa liste email ?</h1>
+    <p class="intro-sub">10 questions pour mesurer ton niveau en email marketing et identifier combien de chiffre d'affaires tu laisses sur la table chaque mois.</p>
+    <div class="meta-row">
+      <div class="meta-item">⏱️ 2 minutes chrono</div>
+      <div class="meta-item">📊 10 questions</div>
+      <div class="meta-item">🎯 Résultat personnalisé</div>
+      <div class="meta-item">🔒 100% gratuit</div>
+    </div>
+    <button class="btn-start" id="btn-start">Commencer le quiz →</button>
+  </div>
+
+  <div id="screen-quiz" style="display:none; width:100%; max-width:680px;">
+    <div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:0%;"></div></div>
+    <div class="q-counter">Question <span id="q-num">1</span> / 10</div>
+    <div class="q-text" id="q-text"></div>
+    <div class="choices" id="choices"></div>
+  </div>
+
+  <div id="screen-email" style="display:none; width:100%; max-width:560px; text-align:center;">
+    <div class="progress-wrap"><div class="progress-fill" style="width:100%;"></div></div>
+    <div class="email-icon">📬</div>
+    <h2>Où envoyer ton <span class="hl">analyse personnalisée</span> ?</h2>
+    <p class="email-sub">Tu recevras immédiatement ton niveau, les séquences que tu rates et un plan d'action concret.</p>
+    <div class="email-preview">
+      <div class="preview-line"><span class="chk">✓</span><span>Ton score sur 30 et ton niveau en email marketing</span></div>
+      <div class="preview-line"><span class="chk">✓</span><span>Les séquences exactes qui te font perdre du CA chaque mois</span></div>
+      <div class="preview-line"><span class="chk">✓</span><span>Un plan d'action personnalisé selon ton niveau</span></div>
+    </div>
+    <form id="email-form" novalidate>
+      <div>
+        <label class="field-label" for="user-email">Ton adresse email</label>
+        <input type="email" id="user-email" class="email-input" placeholder="toi@ta-boutique.com" autocomplete="email" />
+        <div class="field-error" id="email-error">Merci d'entrer une adresse email valide.</div>
+      </div>
+      <button type="submit" class="btn-submit" id="btn-submit">Recevoir mon résultat →</button>
+    </form>
+    <p class="privacy-note">🔒 Pas de spam. Tes données restent confidentielles.</p>
+  </div>
+
+  <div id="screen-result" style="display:none; width:100%; max-width:700px; text-align:center;">
+    <div class="result-badge" id="result-badge"></div>
+    <div class="score-ring" id="score-ring"><div class="score-val" id="score-val"></div></div>
+    <h2 id="result-title"></h2>
+    <p class="result-sub" id="result-sub"></p>
+    <div class="gaps-box">
+      <h3>⚠️ Ce que tu rates probablement</h3>
+      <ul class="gaps-list" id="gaps-list"></ul>
+    </div>
+    <div class="cta-box">
+      <h3>Passons à l'action 🚀</h3>
+      <p id="cta-text"></p>
+      <a href="https://tidycal.com/jordanhenrypaul/30-minute-meeting" target="_blank" rel="noopener" class="btn-cta">Réserver mon appel stratégique gratuit →</a>
+    </div>
+    <div class="result-meta">
+      <div class="result-meta-item">🚀 Livraison 7 à 21 jours</div>
+      <div class="result-meta-item">🔁 Modifications illimitées</div>
+      <div class="result-meta-item">⭐ Satisfaction garantie</div>
+      <div class="result-meta-item">🔒 Appel 100% gratuit</div>
+    </div>
+    <button class="btn-retry" id="btn-retry">↩ Recommencer le quiz</button>
+  </div>
+
+</div>
+
+<footer>
+  <p>© 2026 Jordan Henry Paul — Copywriter Email Marketing · Hélios Rédaction</p>
+</footer>
+
+<script>
+var BREVO_LIST_ID = 5;
+
+var Q = [
+  { t: "As-tu une séquence de bienvenue automatique pour tes nouveaux inscrits ?", c: [
+    { l: "Non, aucun email de bienvenue", s: 0 },
+    { l: "J'envoie un seul email de bienvenue", s: 1 },
+    { l: "J'ai une séquence de 2 à 3 emails", s: 2 },
+    { l: "J'ai une séquence complète de 4+ emails qui vendent dès le premier jour", s: 3 }
+  ]},
+  { t: "As-tu une séquence de récupération de panier abandonné ?", c: [
+    { l: "Non, je ne récupère pas les paniers abandonnés", s: 0 },
+    { l: "J'envoie parfois un rappel manuel", s: 1 },
+    { l: "J'ai un rappel automatique simple (1 email)", s: 2 },
+    { l: "J'ai une séquence de 3 emails avec urgence et preuve sociale", s: 3 }
+  ]},
+  { t: "À quelle fréquence envoies-tu des emails à ta liste ?", c: [
+    { l: "Jamais ou moins d'une fois par mois", s: 0 },
+    { l: "Une à deux fois par mois", s: 1 },
+    { l: "1 à 2 fois par semaine", s: 2 },
+    { l: "Régulièrement, avec un calendrier éditorial défini", s: 3 }
+  ]},
+  { t: "Comment segmentes-tu ta liste email ?", c: [
+    { l: "Je n'ai aucune segmentation, j'envoie à tout le monde", s: 0 },
+    { l: "Je sépare juste acheteurs et non-acheteurs", s: 1 },
+    { l: "J'ai plusieurs segments (nouveaux, actifs, dormants…)", s: 2 },
+    { l: "Segmentation avancée : comportement, historique d'achat, intérêts", s: 3 }
+  ]},
+  { t: "As-tu une séquence post-achat (avis, fidélisation, upsell) ?", c: [
+    { l: "Non, rien après la commande", s: 0 },
+    { l: "J'envoie parfois un email de remerciement manuel", s: 1 },
+    { l: "J'ai un ou deux emails automatiques post-achat", s: 2 },
+    { l: "J'ai une séquence complète : remerciement, usage produit, upsell, avis", s: 3 }
+  ]},
+  { t: "As-tu une séquence de réactivation pour tes clients dormants ?", c: [
+    { l: "Non, mes clients inactifs restent inactifs", s: 0 },
+    { l: "Je fais parfois une promo à toute ma liste", s: 1 },
+    { l: "Je cible parfois mes inactifs, mais sans séquence définie", s: 2 },
+    { l: "J'ai une séquence de win-back automatisée et optimisée", s: 3 }
+  ]},
+  { t: "Quelle part de ton chiffre d'affaires provient du canal email ?", c: [
+    { l: "Je ne sais pas / quasiment rien", s: 0 },
+    { l: "Moins de 5 %", s: 1 },
+    { l: "Entre 5 % et 20 %", s: 2 },
+    { l: "Plus de 20 % — l'email est un canal rentable chez moi", s: 3 }
+  ]},
+  { t: "Quel est ton taux d'ouverture moyen sur tes emails ?", c: [
+    { l: "Je ne le mesure pas", s: 0 },
+    { l: "Moins de 15 %", s: 1 },
+    { l: "Entre 15 % et 35 %", s: 2 },
+    { l: "Plus de 35 % régulièrement", s: 3 }
+  ]},
+  { t: "As-tu une séquence pour les abandons de navigation (produits vus mais non achetés) ?", c: [
+    { l: "Non, jamais entendu parler de ça", s: 0 },
+    { l: "J'y ai pensé mais je n'ai rien mis en place", s: 1 },
+    { l: "J'ai un rappel de base sur les produits consultés", s: 2 },
+    { l: "J'ai une séquence complète avec personnalisation produit", s: 3 }
+  ]},
+  { t: "Fais-tu des A/B tests sur tes emails (objet, contenu, CTA) ?", c: [
+    { l: "Non, jamais", s: 0 },
+    { l: "Très rarement, et sans méthode", s: 1 },
+    { l: "Parfois sur les objets d'emails", s: 2 },
+    { l: "Régulièrement sur les objets, contenus et CTA", s: 3 }
+  ]}
+];
+
+var LV = [
+  { min:0,  max:9,  badge:"Niveau 1 — Débutant",      col:"#ff4d4d", bg:"rgba(255,77,77,0.12)",    br:"rgba(255,77,77,0.3)",
+    subject:"Petit score...",
+    intro:"Soyons honnêtes : ta liste email dort, et chaque semaine qui passe, c'est du chiffre d'affaires qui part chez la concurrence. La bonne nouvelle ? Tu es au bon endroit. Les résultats ci-dessous vont t'expliquer exactement pourquoi et comment corriger ça rapidement.",
+    title:"Ton email marketing n'existe pas encore",
+    sub:"Merci d’avoir fait le quiz. Tu laisses probablement entre 15 % et 30 % de CA sur la table chaque mois. La bonne nouvelle : le potentiel est énorme et les premières séquences sont simples à mettre en place.",
+    gaps:["Aucune séquence de bienvenue — tes nouveaux inscrits t'oublient en 48h","Pas de récupération de panier abandonné — 70 % de tes paniers partent à la concurrence","Pas d'emails post-achat — tes clients n'achètent pas une deuxième fois","0 % du CA vient de l'email — tu es 100 % dépendant des pubs payantes"],
+    cta:"Ton e-commerce a les bases pour générer du CA grâce à l'email — mais sans les séquences adaptées, c'est impossible. En 30 minutes, on fait l'audit complet et tu repartiras avec une feuille de route claire.",
+    emailBody:"<p style='font-size:15px;color:#f0f0f0;font-weight:700;line-height:1.7;margin:0 0 20px;'>Merci d'avoir fait le quiz.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Comme tu as pu le voir, ton score te place dans la catégorie <strong style='color:#ff4d4d;'>Débutant</strong>.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Ce qui veut dire qu'aujourd'hui, ton e-commerce repose essentiellement sur ta capacité à faire venir du trafic, que ce soit via tes publicités, tes lancements ou tes tests de produits, mais qu'il lui manque encore une structure derrière pour capitaliser sur ce trafic une fois qu'il est là.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Et ce n'est pas forcément quelque chose que tu as mal fait.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>C'est simplement une étape que la majorité des e-commerçants repoussent, souvent parce qu'ils sont déjà concentrés sur ce qui leur semble prioritaire : générer des ventes.</p>"
+      +"<p style='font-size:14px;color:#f0f0f0;font-weight:700;line-height:1.75;margin:0 0 14px;'>Le problème, c'est que cette logique a une limite.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Parce qu'à partir du moment où ton business dépend uniquement de l'acquisition, chaque visiteur qui ne convertit pas immédiatement est, dans les faits, perdu.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Et ça arrive beaucoup plus souvent que tu ne le penses.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;padding-left:16px;border-left:3px solid #ff4d4d;'>Des visiteurs qui hésitent.<br>Des paniers abandonnés.<br>Des clients qui achètent une fois, puis disparaissent.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Sans système email derrière, il n'y a aucun moyen de les récupérer, de les relancer ou simplement de rester présent dans leur esprit après leur passage sur ton site.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Ce qui crée une situation assez simple, mais très contraignante sur le long terme : tu es obligé de repartir de zéro, encore et encore, en rachetant du trafic pour générer chaque nouvelle vente.</p>"
+      +"<p style='font-size:14px;color:#f0f0f0;font-weight:700;line-height:1.75;margin:0 0 8px;'>Et c'est ce qui rend un e-commerce instable.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;padding-left:16px;border-left:3px solid #ff4d4d;'>Ce n'est pas le produit ou le marché qui est en cause.<br>Mais l'absence de mécanisme pour transformer un simple visiteur en acheteur, pour créer une relation durable.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Parce qu'un e-commerce solide ne se construit pas uniquement sur sa capacité à attirer du monde, mais sur sa capacité à <strong style='color:#f0f0f0;'>exploiter intelligemment chaque personne qui passe sur son site</strong>, même celles qui n'achètent pas immédiatement.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 24px;'>Et aujourd'hui, sans email, cette partie-là n'existe tout simplement pas dans ton système.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 24px;border-top:1px solid #1e1e2e;padding-top:20px;'>Dans les prochains emails, je vais te montrer pourquoi l'email est devenu un levier central en e-commerce, mais surtout comment poser les premières bases simplement, sans complexité technique, pour commencer à récupérer ce que tu perds déjà sans t'en rendre compte.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0;'>À très vite,<br><strong style='color:#e8a020;'>Jordan</strong></p>" },
+  { min:10, max:17, badge:"Niveau 2 — En construction", col:"#ff8c52", bg:"rgba(255,140,82,0.12)",  br:"rgba(255,140,82,0.3)",
+    subject:"Tu as les bases mais... tu perds du CA chaque semaine",
+    intro:"Tu as fait le premier pas en matière d'email marketing. C'est déjà mieux que 60 % des e-commerces. Mais entre 'avoir des emails' et 'avoir une machine à vendre', il y a un gouffre — et ce gouffre te coûte cher, chaque semaine, en silence.",
+    title:"Tu as des bases, mais tu perds énormément de CA.",
+    sub:"Tu envoies des emails, tu as peut-être une ou deux automatisations. Mais il manque les séquences clés qui font la différence entre un email marketing passable et une vraie machine à vendre.",
+    gaps:["Séquences incomplètes — tu n'exploites pas tout le potentiel de chaque contact","Pas de segmentation avancée — tu envoies le mauvais message aux mauvaises personnes","Pas de win-back — tes clients dormants ne reviendront jamais d'eux-mêmes","Faible taux d'ouverture — tes emails n'arrivent pas ou ne sont pas lus"],
+    cta:"Tu as déjà investi dans l'email — mais sans la bonne stratégie, c'est du potentiel gâché. Un appel de 30 minutes suffira pour identifier les 2 ou 3 séquences qui vont immédiatement booster ton CA.",
+    emailBody:"<p style='font-size:15px;color:#f0f0f0;font-weight:700;line-height:1.7;margin:0 0 20px;'>Merci d'avoir fait le quiz.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Comme tu as pu le voir, ton score te place dans la catégorie <strong style='color:#ff8c52;'>En construction</strong>.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Ce qui veut dire qu'aujourd'hui, tu as déjà commencé à intégrer l'email dans ton e-commerce, mais que ce levier reste encore partiellement exploité, souvent de manière ponctuelle, sans réelle structure derrière.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Tu envoies peut-être des campagnes et mis en place une ou deux automatisations, donc tu comprends déjà que ça peut générer des ventes.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Mais malgré ça, tu sens que quelque chose ne prend pas vraiment, que les résultats sont irréguliers.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Et surtout, que l'email ne joue pas encore le rôle qu'il devrait avoir dans ton business pour augmenter ton chiffre d'affaires.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Mais le problème ne vient pas du fait que tu ne fais rien.</p>"
+      +"<p style='font-size:14px;color:#f0f0f0;font-weight:700;line-height:1.75;margin:0 0 8px;'>Il vient du fait que ce que tu fais aujourd'hui n'est pas organisé comme un écosystème.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 8px;'>Parce que dans la majorité des cas, à ce stade, l'email ressemble à ça :</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;padding-left:16px;border-left:3px solid #ff8c52;'>Des campagnes envoyées de temps en temps, souvent liées à une promo ou à une nouveauté.<br>Quelques flows en place, mais incomplets, parfois mal connectés entre eux.<br>Et surtout, aucune vraie logique d'ensemble qui guide le parcours du client après son inscription ou son premier achat.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Ce qui crée une situation assez trompeuse.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Parce que tu génères déjà un peu de chiffre d'affaires avec l'email, ce qui donne l'impression que &ldquo;ça fonctionne un peu&rdquo;. Alors qu'en réalité, tu es encore très loin de ce que ce levier peut produire.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 8px;'>Et pendant ce temps-là, il y a des opportunités qui passent complètement sous le radar.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;padding-left:16px;border-left:3px solid #ff8c52;'>Des visiteurs qui s'inscrivent sans jamais être vraiment travaillés.<br>Des paniers abandonnés qui pourraient être récupérés beaucoup plus efficacement.<br>Des clients qui achètent une fois, puis ne reçoivent rien de suffisamment structuré pour revenir.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Ce n'est pas un problème de volume, c'est un problème de profondeur et de structuration.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Parce que l'email ne devient réellement puissant qu'à partir du moment où il est pensé comme un écosystème cohérent, où chaque séquence a un rôle précis, et où chaque interaction de ton client s'inscrit dans une logique globale.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 24px;'>Et aujourd'hui, c'est probablement cette structure qui te manque pour exploiter l'email marketing à son plein potentiel.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 24px;border-top:1px solid #1e1e2e;padding-top:20px;'>Dans les prochains emails, je vais te montrer comment structurer un écosystème email simple mais complet — quelles sont les séquences prioritaires à mettre en place, et pourquoi ce sont elles qui font la différence entre un e-commerce qui &ldquo;envoie des emails&rdquo; et un e-commerce qui s'appuie dessus pour générer une part significative de son chiffre d'affaires.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0;'>À très vite,<br><strong style='color:#e8a020;'>Jordan</strong></p>" },
+  { min:18, max:23, badge:"Niveau 3 — Intermédiaire",  col:"#e8c020", bg:"rgba(232,192,32,0.12)",  br:"rgba(232,192,32,0.3)",
+    subject:"Tu es à mi-chemin",
+    intro:"Tu es dans le tiers supérieur des e-commerces sur l'email marketing — et ça, c'est réel. Mais il y a un fossé entre 'ça tourne' et 'ça génère 25 % du CA chaque mois'. Ce fossé, il tient à 2 ou 3 séquences précises que tu n'as pas encore. Voici lesquelles.",
+    title:"Tu progresses, mais il manque encore des séquences clés.",
+    sub:"Ton email marketing fonctionne, mais il n'est pas encore une machine à vendre. Il te manque des séquences avancées et une segmentation plus fine pour maximiser chaque euro de ta liste.",
+    gaps:["Pas de séquence VIP — tu ne récompenses pas tes meilleurs clients","Pas d'abandon de navigation — tu rates des ventes sur les visiteurs hésitants","A/B tests insuffisants — tu ne sais pas ce qui convertit vraiment","L'email représente moins de 20 % du CA — la marge de progression est immense"],
+    cta:"Tu es proche d'un email marketing vraiment performant. Les optimisations qui te manquent ne prennent pas longtemps. Parlons-en en 30 minutes et on identifie ce qui va débloquer tes revenus.",
+    emailBody:"<p style='font-size:15px;color:#f0f0f0;font-weight:700;line-height:1.7;margin:0 0 20px;'>Merci d'avoir fait le quiz.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Comme tu as pu le voir, ton score te place dans la catégorie <strong style='color:#e8c020;'>Intermédiaire</strong>.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Ce qui veut dire qu'aujourd'hui, tu as déjà dépassé le stade où l'email est un simple canal secondaire dans ton e-commerce.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Et que tu as commencé à construire quelque chose de structuré, avec quelques flows en place, des campagnes régulières, et une vraie compréhension du rôle que ce levier peut jouer dans ta croissance.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>À ce niveau-là, la majorité des marques commencent à voir des résultats intéressants, ce qui valide l'effort investi et donne l'impression d'être sur la bonne trajectoire.</p>"
+      +"<p style='font-size:14px;color:#f0f0f0;font-weight:700;line-height:1.75;margin:0 0 14px;'>Mais c'est aussi à ce moment précis que les choses deviennent plus subtiles.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Parce que le sujet n'est plus de savoir si l'email fonctionne, mais de comprendre pourquoi, malgré tout ce qui est déjà en place, les performances finissent par ralentir ou évoluer beaucoup moins vite que le reste du business.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Et ce ralentissement est rarement lié à un problème visible ou à une erreur évidente, mais plutôt à une forme de limite dans la manière dont le système a été construit au départ.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Dans la plupart des cas, ce que l'on observe, c'est un ensemble de mécaniques qui continuent de produire des résultats.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Mais qui reposent encore sur des logiques assez générales, sans aller exploiter pleinement tout ce que l'email marketing permet en termes d'adaptation au comportement des utilisateurs, de variation des messages ou de gestion du timing.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Ce n'est pas un manque de travail de ta part, mais un manque de profondeur dans la façon dont chaque élément du système interagit avec les autres.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Et c'est cette profondeur qui fait la différence entre un email qui fonctionne correctement pour convertir et un email capable de soutenir une vraie croissance sur le long terme, sans dépendre uniquement de l'acquisition pour progresser.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>À partir de là, la difficulté n'est plus d'ajouter de nouveaux éléments.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 24px;'>Mais de faire évoluer intelligemment ce qui existe déjà, en identifiant les points de friction invisibles, ceux qui ne bloquent pas totalement les résultats, mais qui empêchent le système d'atteindre son plein potentiel.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 24px;border-top:1px solid #1e1e2e;padding-top:20px;'>Dans les prochains emails, je vais te montrer comment repérer ces limites, comprendre d'où elles viennent, et surtout comment faire évoluer ton système email sans tout reconstruire, en t'appuyant sur ce que tu as déjà mis en place.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0;'>À très vite,<br><strong style='color:#e8a020;'>Jordan</strong></p>" },
+  { min:24, max:27, badge:"Niveau 4 — Avancé",         col:"#3ecf8e", bg:"rgba(62,207,142,0.12)",  br:"rgba(62,207,142,0.3)",
+    subject:"Tu es dans le top 20",
+    intro:"Sincèrement, tu fais partie des rares e-commerces qui traitent l'email comme un vrai canal de CA. Tu as des systèmes, une stratégie, tu mesures. C'est solide. Mais le top 5% — ceux qui génèrent 30 % de leur CA par email — ça se joue sur des détails précis. Je t'explique lesquels.",
+    title:"Ton email marketing est solide.",
+    sub:"Tu utilises l'email de façon sérieuse. Tu as des séquences, une stratégie et tu mesures tes résultats. Il reste quelques optimisations pour passer au niveau supérieur.",
+    gaps:["Quelques séquences perfectibles pour maximiser le taux de conversion","La segmentation pourrait être plus granulaire pour augmenter la pertinence","Les A/B tests pourraient être plus systématiques","Le copywriting de certains emails peut encore être amélioré"],
+    cta:"Tu as de bonnes bases. Un oeil expert peut repérer en 30 minutes les optimisations qui vont te faire passer de 'bon email marketing' à 'machine à vendre'. C'est gratuit et sans engagement.",
+    emailBody:"<p style='font-size:15px;color:#f0f0f0;font-weight:700;line-height:1.7;margin:0 0 20px;'>Merci d'avoir fait le quiz.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Comme tu as pu le voir, ton score te place dans la catégorie <strong style='color:#3ecf8e;'>Avancé</strong>.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Ce qui veut dire qu'aujourd'hui, ton email marketing est déjà structuré et qu'il joue un rôle réel pour ton e-commerce, avec des séquences en place, des campagnes cohérentes, et une contribution directe à ton chiffre d'affaires.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>À ce stade, tu n'es plus en train de &ldquo;mettre en place&rdquo; quelque chose, mais de t'appuyer sur un système qui fonctionne déjà et sur lequel tu peux compter.</p>"
+      +"<p style='font-size:14px;color:#f0f0f0;font-weight:700;line-height:1.75;margin:0 0 14px;'>La difficulté, en revanche, devient différente de celle des niveaux précédents.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Parce que les premiers gains, ceux qui viennent avec la mise en place des fondamentaux, ont déjà été captés.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Et que la progression repose désormais sur des éléments beaucoup moins évidents à percevoir, qui ne se voient pas immédiatement dans la structure globale du système mais plutôt dans la manière dont il s'exécute au quotidien.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Dans la plupart des cas, cela se traduit par un email marketing qui continue de produire des résultats solides, mais dont l'évolution devient plus lente, non pas à cause d'un manque d'activité ou d'idées, mais parce que le système n'a pas été pensé dès le départ pour être affiné à ce niveau de détail ou pour s'adapter à une croissance plus avancée.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Le but n'est plus de construire ou d'ajouter, mais d'identifier avec précision ce qui peut être amélioré dans ce qui existe déjà, ce qui demande une lecture plus fine des performances, une meilleure compréhension du comportement des utilisateurs et une capacité à faire évoluer le système sans le complexifier inutilement.</p>"
+      +"<p style='font-size:14px;color:#f0f0f0;font-weight:700;line-height:1.75;margin:0 0 14px;'>C'est à ce moment-là que les décisions les plus importantes ne sont plus visibles à l'œil nu.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Parce qu'elles concernent des ajustements dans la façon dont les séquences s'articulent entre elles, dans le rythme des envois ou dans la manière dont certains segments réagissent à des variations parfois très légères.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 24px;'>Et c'est précisément ce niveau de lecture qui permet de transformer un système déjà solide en un levier réellement optimisé, capable de continuer à progresser sans dépendre uniquement d'une augmentation au niveau de l'acquisition.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 24px;border-top:1px solid #1e1e2e;padding-top:20px;'>Dans les prochains emails, je vais te montrer comment identifier ces zones d'optimisation, comprendre ce qui limite réellement la progression de ton système actuel, et surtout comment le faire évoluer de manière cohérente sans repartir de zéro.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0;'>À très vite,<br><strong style='color:#e8a020;'>Jordan</strong></p>" },
+  { min:28, max:30, badge:"Niveau 5 — Expert",         col:"#4f8cff", bg:"rgba(79,140,255,0.12)",  br:"rgba(79,140,255,0.3)",
+    subject:"Top 5 bravo",
+    intro:"Chapeau. Vraiment. Tu fais partie du top 5 % des e-commerces sur l'email marketing — ceux qui ont compris que leur liste est leur actif le plus précieux. Maintenant la vraie question : est-ce que tes emails convertissent autant qu'ils le pourraient ? Parce qu'un bon système avec un copywriting moyen, c'est un moteur Ferrari avec du carburant bas de gamme.",
+    title:"Tu exploites ta liste email comme un pro.",
+    sub:"Bravo — tu fais partie des rares e-commerces qui utilisent vraiment l'email comme un canal de CA à part entière. La question maintenant : est-ce que le copywriting de tes emails est aussi au niveau ?",
+    gaps:["Un audit copywriting peut encore augmenter tes taux de clic et de conversion","Des séquences avancées (loyauté, parrainage) peuvent amplifier tes résultats","La délivrabilité et la réputation de domaine méritent toujours d'être surveillées","Un regard extérieur permet souvent de repérer des angles morts invisibles de l'intérieur"],
+    cta:"Tu as un excellent niveau. Pour aller encore plus loin, parlons de l'optimisation du copywriting de tes séquences. 30 minutes, 100 % gratuit.",
+    emailBody:"<p style='font-size:15px;color:#f0f0f0;font-weight:700;line-height:1.7;margin:0 0 20px;'>Merci d'avoir fait le quiz.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Comme tu as pu le voir, ton score te place dans la catégorie <strong style='color:#4f8cff;'>Expert</strong>.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Ce qui veut dire qu'aujourd'hui, ton email marketing est déjà à un niveau avancé, avec un écosystème en place qui fonctionne, qui génère du chiffre d'affaires de manière régulière et qui s'intègre pleinement dans ton e-commerce.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>À ce stade, l'objectif n'est plus de comprendre comment fonctionne l'email ni même de chercher à mettre en place de nouvelles bases, puisque ces éléments sont déjà maîtrisés et font partie de ton fonctionnement quotidien.</p>"
+      +"<p style='font-size:14px;color:#f0f0f0;font-weight:700;line-height:1.75;margin:0 0 14px;'>La vraie question devient différente.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Elle concerne davantage la manière dont ce levier s'intègre dans ton organisation globale, notamment en termes de temps, de focus et de priorités.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Parce que plus ton business se développe, plus ton attention est sollicitée sur des sujets à plus fort impact, et moins il devient pertinent de consacrer du temps à des optimisations opérationnelles, même si elles restent importantes.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Dans ce contexte, l'email marketing reste un levier extrêmement rentable.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>Mais il devient aussi un sujet qui demande une certaine exigence dans son exécution, une régularité dans les ajustements et une capacité à suivre des performances avec suffisamment de précision pour continuer à progresser sans ralentir le reste du business.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 14px;'>C'est souvent à ce moment-là que se pose la question de la délégation, non pas comme un moyen de se décharger complètement, mais comme une manière de confier ce levier à quelqu'un capable de le maintenir, de l'optimiser et de le faire évoluer dans la continuité de ce qui a déjà été construit.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 24px;'>L'enjeu n'est donc pas de repartir de zéro ni de transformer radicalement le système existant, mais de s'assurer qu'il continue à progresser au bon rythme, sans devenir une source de dispersion ou de perte d'attention sur les décisions stratégiques qui ont un impact plus direct sur la croissance globale de ton e-commerce.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0 0 24px;border-top:1px solid #1e1e2e;padding-top:20px;'>Dans les prochains emails, je vais te montrer comment les e-commerces les plus avancés abordent cette transition, ce qu'ils délèguent réellement, ce qu'ils gardent en interne, et comment ils s'assurent que leur email marketing continue de performer sans devenir un sujet qui monopolise leur temps.</p>"
+      +"<p style='font-size:14px;color:#aaaacc;line-height:1.75;margin:0;'>À très vite,<br><strong style='color:#e8a020;'>Jordan</strong></p>" }
+];
+
+var curQ = 0, score = 0, done = false;
+var sI = document.getElementById('screen-intro');
+var sQ = document.getElementById('screen-quiz');
+var sE = document.getElementById('screen-email');
+var sR = document.getElementById('screen-result');
+var pF = document.getElementById('progress-fill');
+
+function show(el) {
+  el.style.display = 'block';
+  el.classList.remove('fade-in');
+  void el.offsetWidth;
+  el.classList.add('fade-in');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function hide(el) { el.style.display = 'none'; }
+function getLevel(n) { for (var i = 0; i < LV.length; i++) { if (n >= LV[i].min && n <= LV[i].max) return LV[i]; } return LV[0]; }
+function okEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+document.getElementById('btn-start').addEventListener('click', function() {
+  hide(sI); show(sQ); renderQ();
+});
+
+function renderQ() {
+  done = false;
+  var q = Q[curQ];
+  document.getElementById('q-num').textContent = curQ + 1;
+  document.getElementById('q-text').textContent = q.t;
+  pF.style.width = Math.round((curQ / Q.length) * 100) + '%';
+  var cont = document.getElementById('choices');
+  cont.innerHTML = '';
+  var letters = ['A','B','C','D'];
+  for (var i = 0; i < q.c.length; i++) {
+    (function(ch, idx) {
+      var btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.innerHTML = '<span class="letter">' + letters[idx] + '</span><span>' + ch.l + '</span>';
+      btn.addEventListener('click', function() { pick(btn, ch.s); });
+      cont.appendChild(btn);
+    })(q.c[i], i);
+  }
+}
+
+function pick(btn, s) {
+  if (done) return;
+  done = true;
+  score += s;
+  var all = document.querySelectorAll('.choice-btn');
+  for (var i = 0; i < all.length; i++) { all[i].disabled = true; all[i].style.transform = 'none'; }
+  btn.classList.add('selected');
+  setTimeout(function() {
+    curQ++;
+    if (curQ < Q.length) { renderQ(); }
+    else { hide(sQ); show(sE); }
+  }, 480);
+}
+
+document.getElementById('email-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  var inp  = document.getElementById('user-email');
+  var err  = document.getElementById('email-error');
+  var btn  = document.getElementById('btn-submit');
+  var mail = inp.value.trim();
+  if (!okEmail(mail)) {
+    inp.classList.add('error'); err.classList.add('show'); inp.focus(); return;
+  }
+  inp.classList.remove('error'); err.classList.remove('show');
+  btn.disabled = true; btn.textContent = 'Envoi en cours…';
+  var lv = getLevel(score);
+  sendBrevo(mail, lv);
+  hide(sE);
+  showResult(lv);
+});
+
+document.getElementById('user-email').addEventListener('input', function() {
+  document.getElementById('user-email').classList.remove('error');
+  document.getElementById('email-error').classList.remove('show');
+});
+
+function sendBrevo(mail, lv) {
+  var KEY = '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';
+  var H = { 'api-key': KEY, 'Content-Type': 'application/json', 'Accept': 'application/json' };
+  fetch('https://api.brevo.com/v3/contacts', {
+    method: 'POST', headers: H,
+    body: JSON.stringify({ email: mail, updateEnabled: true, listIds: [BREVO_LIST_ID], attributes: { SCORE_QUIZ: score, NIVEAU_QUIZ: lv.badge } })
+  }).catch(function(){});
+  fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST', headers: H,
+    body: JSON.stringify({
+      sender: { name: 'Jordan Henry Paul', email: 'heliosredaction@gmail.com' },
+      to: [{ email: mail }],
+      subject: lv.subject,
+      htmlContent: makeEmail(lv)
+    })
+  }).catch(function(){});
+}
+
+function makeEmail(lv) {
+  var cl = '<' + '/';
+  var o = '';
+  o += '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
+  o += '<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">' + cl + 'head>';
+  o += '<body style="margin:0;padding:0;background:#0a0a0f;font-family:Arial,sans-serif;">';
+  o += '<table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:40px 20px;">';
+  o += '<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#0f0f1a;border-radius:12px;overflow:hidden;">';
+  o += '<tr><td style="padding:32px 40px;text-align:center;background:#141420;border-bottom:1px solid #1e1e2e;">';
+  o += '<p style="margin:0 0 6px;font-size:11px;font-weight:bold;letter-spacing:2px;color:#e8a020;text-transform:uppercase;">JORDAN HENRY PAUL &mdash; H&Eacute;LIOS R&Eacute;DACTION' + cl + 'p>';
+  o += '<h1 style="margin:0;font-size:24px;font-weight:900;color:#f0f0f0;">Voici ton r&eacute;sultat &#128202;' + cl + 'h1>';
+  o += cl + 'td>' + cl + 'tr>';
+  o += '<tr><td style="padding:32px 40px;text-align:center;">';
+  o += '<div style="display:inline-block;background:' + lv.bg + ';border:1px solid ' + lv.br + ';color:' + lv.col + ';font-size:12px;font-weight:bold;padding:6px 18px;border-radius:50px;text-transform:uppercase;">' + lv.badge + cl + 'div>';
+  o += '<p style="margin:16px 0 4px;font-size:44px;font-weight:900;color:#f0f0f0;line-height:1;">' + score + '<span style="font-size:18px;color:#8888aa;font-weight:400;">/30' + cl + 'span>' + cl + 'p>';
+  o += '<p style="margin:0;font-size:12px;color:#8888aa;">ton score' + cl + 'p>';
+  o += cl + 'td>' + cl + 'tr>';
+  if (lv.emailBody) {
+    o += '<tr><td style="padding:28px 40px 36px;">' + lv.emailBody + cl + 'td>' + cl + 'tr>';
+  } else {
+    var gaps = '';
+    for (var i = 0; i < lv.gaps.length; i++) {
+      gaps += '<tr><td style="padding:10px 0;border-bottom:1px solid #222233;color:#aaaacc;font-size:14px;line-height:1.5;">'
+            + '<b style="color:#e8a020;">&rarr;</b> ' + lv.gaps[i]
+            + cl + 'td>' + cl + 'tr>';
+    }
+    o += '<tr><td style="padding:0 40px 28px;">';
+    o += '<p style="margin:0 0 16px;font-size:14px;color:#e8a020;font-weight:700;line-height:1.6;font-style:italic;">' + lv.intro + cl + 'p>';
+    o += '<h2 style="margin:0 0 10px;font-size:18px;font-weight:900;color:#f0f0f0;">' + lv.title + cl + 'h2>';
+    o += '<p style="margin:0;font-size:14px;color:#aaaacc;line-height:1.7;">' + lv.sub + cl + 'p>';
+    o += cl + 'td>' + cl + 'tr>';
+    o += '<tr><td style="padding:0 40px 28px;">';
+    o += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#111120;border:1px solid #1e1e2e;border-radius:10px;padding:20px;">';
+    o += '<tr><td style="padding-bottom:12px;"><b style="font-size:14px;color:#f0f0f0;">&nbsp;Ce que tu rates probablement' + cl + 'b>' + cl + 'td>' + cl + 'tr>';
+    o += gaps;
+    o += cl + 'table>' + cl + 'td>' + cl + 'tr>';
+    o += '<tr><td style="padding:0 40px 28px;">';
+    o += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#1a1408;border:1px solid rgba(232,160,32,0.3);border-radius:10px;">';
+    o += '<tr><td style="padding:24px 28px;text-align:center;">';
+    o += '<h3 style="margin:0 0 8px;font-size:16px;font-weight:900;color:#f0f0f0;">Passons &agrave; l\'action &#128640;' + cl + 'h3>';
+    o += '<p style="margin:0 0 20px;font-size:13px;color:#aaaacc;line-height:1.6;">' + lv.cta + cl + 'p>';
+    o += '<a href="https://tidycal.com/jordanhenrypaul/30-minute-meeting" style="display:inline-block;background:#e8a020;color:#1a1200;padding:12px 32px;border-radius:8px;font-weight:900;font-size:14px;text-decoration:none;">R&eacute;server mon appel gratuit &rarr;' + cl + 'a>';
+    o += cl + 'td>' + cl + 'tr>' + cl + 'table>' + cl + 'td>' + cl + 'tr>';
+  }
+  o += '<tr><td style="padding:20px 40px;text-align:center;border-top:1px solid #1e1e2e;">';
+  o += '<p style="margin:0;font-size:11px;color:#555577;">&copy; 2026 Jordan Henry Paul &mdash; H&eacute;lios R&eacute;daction' + cl + 'p>';
+  o += cl + 'td>' + cl + 'tr>';
+  o += cl + 'table>' + cl + 'td>' + cl + 'tr>' + cl + 'table>';
+  o += cl + 'body>' + cl + 'html>';
+  return o;
+}
+
+function showResult(lv) {
+  show(sR);
+  var pct = Math.round((score / 30) * 100);
+  document.getElementById('score-ring').style.setProperty('--pct', pct + '%');
+  document.getElementById('score-val').textContent = score + '/30';
+  var badge = document.getElementById('result-badge');
+  badge.textContent = lv.badge;
+  badge.style.color = lv.col;
+  badge.style.background = lv.bg;
+  badge.style.border = '1px solid ' + lv.br;
+  document.getElementById('result-title').textContent = lv.title;
+  document.getElementById('result-sub').textContent   = lv.sub;
+  document.getElementById('cta-text').textContent     = lv.cta;
+  var list = document.getElementById('gaps-list');
+  list.innerHTML = '';
+  for (var i = 0; i < lv.gaps.length; i++) {
+    var li = document.createElement('li');
+    li.innerHTML = '<span class="dot">&rarr;</span><span>' + lv.gaps[i] + '</span>';
+    list.appendChild(li);
+  }
+}
+
+document.getElementById('btn-retry').addEventListener('click', function() {
+  curQ = 0; score = 0; done = false;
+  pF.style.width = '0%';
+  document.getElementById('email-form').reset();
+  var btn = document.getElementById('btn-submit');
+  btn.disabled = false;
+  btn.textContent = 'Recevoir mon résultat →';
+  hide(sR); show(sI);
+});
+</script>
+
+</body>
+</html>
