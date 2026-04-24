@@ -41,7 +41,7 @@ export default async function handler(req, res) {
       method: 'POST',
       headers,
       body: JSON.stringify({
-        sender: { name: 'Jordan Henry Paul', email: 'heliosredaction@gmail.com' },
+        sender: { name: 'Jordan Henry Paul', email: 'jordan@heliosredaction.fr' },
         to: [{ email }],
         subject: subject || 'Voici ton résultat',
         htmlContent: htmlContent || '<p>Merci d’avoir fait le quiz.</p>'
