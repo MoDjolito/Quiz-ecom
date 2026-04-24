@@ -433,21 +433,19 @@ document.getElementById('user-email').addEventListener('input', function() {
 });
 
 function sendBrevo(mail, lv) {
-  var KEY = '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';
-  var H = { 'api-key': KEY, 'Content-Type': 'application/json', 'Accept': 'application/json' };
-  fetch('https://api.brevo.com/v3/contacts', {
-    method: 'POST', headers: H,
-    body: JSON.stringify({ email: mail, updateEnabled: true, listIds: [BREVO_LIST_ID], attributes: { SCORE_QUIZ: score, NIVEAU_QUIZ: lv.badge } })
-  }).catch(function(){});
-  fetch('https://api.brevo.com/v3/smtp/email', {
-    method: 'POST', headers: H,
+  return fetch('/api/brevo', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
     body: JSON.stringify({
-      sender: { name: 'Jordan Henry Paul', email: 'heliosredaction@gmail.com' },
-      to: [{ email: mail }],
+      email: mail,
+      score: score,
+      level: lv.badge,
       subject: lv.subject,
       htmlContent: makeEmail(lv)
     })
-  }).catch(function(){});
+  }).catch(function(error) {
+    console.error('Erreur Brevo :', error);
+  });
 }
 
 function makeEmail(lv) {
